@@ -1,0 +1,15 @@
+/*============== 404 ================*/
+.notfound-content{
+    width:70%;
+    margin: 7% auto;
+    text-align: center;
+    font-family: arial, sans-serif;
+}
+.img-404{
+    left: 50%;
+    top: 50%;
+}
+.notfound h4 h2 p{
+    font-family:Arial;
+    text-align: center;
+}

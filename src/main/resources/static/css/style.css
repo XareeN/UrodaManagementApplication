@@ -1,0 +1,295 @@
+.CUSTOM-container-fluid{
+    padding-left: 0px;
+    padding-right: 0px;
+}
+.myNavbar{
+    /*-webkit-border-radius:0px !important;*/
+    /*-moz-border-radius:0px !important;*/
+    /*border-radius:0px !important;*/
+
+    /*border-color: transparent !important;*/
+    /*background: transparent;*/
+    /*margin-bottom:0px !important;*/
+    /*padding:0 10% 0 10%;*/
+
+    /* Permalink - use to edit and share this gradient: http://colorzilla.com/gradient-editor/#000000+0,000000+100&0.65+0,0+100;Neutral+Density */
+    background: -moz-linear-gradient(top, rgba(0,0,0,0.65) 0%, rgba(0,0,0,0) 100%); /* FF3.6-15 */
+    background: -webkit-linear-gradient(top, rgba(0,0,0,0.65) 0%,rgba(0,0,0,0) 100%); /* Chrome10-25,Safari5.1-6 */
+    background: linear-gradient(to bottom, rgba(0,0,0,0.65) 0%,rgba(0,0,0,0) 100%); /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
+    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#a6000000', endColorstr='#00000000',GradientType=0 ); /* IE6-9 */
+    border:0 !important;
+}
+.myNavbar::before{
+    filter: blur(5px);
+}
+@media screen and (max-width: 768px){
+    .myNavbar{
+        padding:0 0 0 7%;
+    }
+}
+@media (min-width:768px){
+    .navbar-nav>li{
+        width:120px;
+        display:flex;
+        flex-direction:column;
+        justify-content:center
+    }
+    .navbar-nav>li>a{
+        text-align:center;
+        font-size:1.3em
+    }
+}
+@media screen and (max-width: 735px){
+    .footer-low{
+        height: 75px !important;
+    }
+    .footerDetailsRight, .footerDetailsLeft{
+        float: none !important;
+        text-align: center;
+        margin: auto !important;
+    }
+}
+@media screen and (max-width: 735px) {
+    #footer-content .footer-box {
+        width: 48.4%;
+        vertical-align: baseline;
+    }
+}
+
+/*||||||||||||||||||||||||||||||||||||||||||||| PARALLAX SCROLLING ||||||||||||||||||||||||||||||||||||||||||||||||||*/
+
+.wrapper {
+    width: 100%;
+    margin: 0 auto;
+}
+section.module.content {
+    padding: 40px 0;
+}
+.container {
+    width: 100%;
+    margin: 0 auto;
+    padding: 0;
+}
+section.module.parallax{
+    padding: 40px;
+}
+section.module.parallax-2 {
+    /*background-image: url("../pics/uroda/Bea065.jpg");*/
+}
+@media all and (min-width: 600px) {
+    section.module h2 {
+        font-size: 42px;
+    }
+    section.module p {
+        font-size: 20px;
+    }
+    section.module.parallax {
+        padding: 200px 0;
+    }
+    section.module.parallax-first {
+        padding: 0px;
+    }
+    section.module.parallax h1 {
+        font-size: 96px;
+    }
+}
+@media all and (min-width: 960px) {
+    section.module.parallax h1 {
+        font-size: 160px;
+    }
+}
+
+/*
+#blurryscroll {
+    top: 0; left: 0;
+    width: 100%;
+    height: 5rem;
+    overflow: hidden;
+    position: fixed;
+    filter: blur(4px);
+}
+.nav {
+@extend #blurryscroll;
+    filter: none;
+    text-align: right;
+
+a {
+    display: inline-block;
+    padding: 1rem;
+    text-decoration: none;
+    color: #000;
+    font-size: 1.2rem;
+}
+}*/
+.myNavbarPosition{
+    position: fixed;
+    width:100%;
+    z-index:2;
+}
+.mainCarousel{
+    z-index:0;
+}
+.carousel-caption>h4{
+    font-size:2.5em;
+}
+.carousel-caption>p{
+    font-size: 1.2em;
+}
+.customInfo{  /*border gradient nie działa*/
+    border-top: 1px solid;
+    /* Permalink - use to edit and share this gradient: http://colorzilla.com/gradient-editor/#ffe5bf+0,ffad66+53,ffe5bf+100 */
+    /*border: #ffe5bf;  Old browsers */
+    -moz-border-image: -moz-linear-gradient(left, #ffe5bf 0%, #ffad66 53%, #ffe5bf 100%); /* FF3.6-15 */
+    -webkit-border-image: -webkit-linear-gradient(left, #ffe5bf 0%,#ffad66 53%,#ffe5bf 100%); /* Chrome10-25,Safari5.1-6 */
+    border-image: linear-gradient(to right, #ffe5bf 0%,#ffad66 53%,#ffe5bf 100%); /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
+
+    text-align: center;
+    padding-bottom: 20px;
+    padding-left: 0px !important;
+    padding-right: 0px !important;
+}
+
+
+/*================= footer ==================*/
+#footer{
+    /*
+    /* Permalink - use to edit and share this gradient: http://colorzilla.com/gradient-editor/#ffb032+0,ff800a+100
+    background: #ffb032; /* Old browsers
+    background: -moz-linear-gradient(top, #ffb032 0%, #ff800a 100%); /* FF3.6-15
+    background: -webkit-linear-gradient(top, #ffb032 0%,#ff800a 100%); /* Chrome10-25,Safari5.1-6
+    background: linear-gradient(to bottom, #ffb032 0%,#ff800a 100%); /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+
+    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#ffb032', endColorstr='#ff800a',GradientType=0 ); /* IE6-9
+    */
+    margin-top: 20px;
+    height: auto;
+    background-color: #252525;
+}
+.footer-low{
+    width:100%;
+    height:55px;
+    padding-top:20px;
+    background-color: #141414;
+    color: #dddddd;
+}
+.footer-low p{
+    margin:0;
+}
+
+.footer-high{
+    width:100%;
+    height:auto;
+    background-color: #252525;
+    color: #b3b3b1;
+    display: inline-flex;
+}
+.footer-high h4{
+    color: #5d5d5d;
+}
+#footer-facebook{
+    margin-left:3.3%;
+}
+#footer-content{
+    display: inline-flex;
+    width: 100%;
+    margin-top: 30px;
+    padding: 0 4% 3% 4%;
+}
+.footer-box{
+    width: 22.6%;
+    /* padding: 35px 40px 40px 40px; */
+    float: left;
+    margin-right: 3.3%;
+}
+.footer-box p{
+    margin: 0 0 10px 0;
+}
+.footerDetailsLeft{
+    margin-left: 50px;
+    float: left;
+    color: #555555;
+}
+.footerDetailsRight{
+    margin-right: 40px;
+    float: right;
+    color: #555555;
+}
+#map {
+    height: 80%;
+    width: 100%;
+    background-color: grey;
+}
+
+.submit-btn{
+
+}
+
+.margin-auto{
+    margin: auto;
+    float: none !important;
+}
+
+/*style tabeli #4CAF50*/
+.table-default{
+    font-family: "Trebuchet MS", Arial, Helvetica, sans-serif;
+    border-collapse: collapse;
+    width: 100%;
+}
+.table-default td, .table-default th {
+    border: 1px solid #ddd;
+    padding: 8px;
+}
+.table-default tr:nth-child(even){background-color: #f2f2f2;}
+.table-default tr:hover {background-color: #ddd;}
+.table-default tr:first-child {
+    padding-top: 12px;
+    padding-bottom: 12px;
+    text-align: left;
+    background-color: #f0ad4e;
+    color: white;
+    height: 70px;
+}
+/*style tabeli - koniec*/
+
+.btn-save{
+    float: right;
+    margin-top: 5px;
+}
+.btn-toggle{
+    float: left;
+    margin-bottom: 5px;
+}
+.main-content{
+    padding-top: 70px !important;
+}
+
+.config-navbar{
+    position: fixed !important;
+    top: 0;
+    width: 100%;
+    z-index: 1;
+}
+.config-li-btn{
+    margin-top: 8px;
+}
+.config-body{
+    /*background: url("../pics/blurred-background-10.jpg") no-repeat fixed right;*/
+}
+.config-checkbox{
+    height: 20px !important;
+    width: 20px !important;
+}
+.td-width{
+    width: 40px;
+}
+.logged-info-span{
+    margin: 5px auto 8px 0;
+}
+.inline{
+    display: inline !important;
+}
+
+/*77, 275 zakomentowane*/
+
+.helvetica{
+    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+}
