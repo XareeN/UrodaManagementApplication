@@ -3,6 +3,10 @@ import {Link} from "react-router-dom";
 import Carousel from "react-bootstrap/es/Carousel";
 import Modal from "react-bootstrap/es/Modal";
 import Button from "react-bootstrap/es/Button";
+import Dialog from 'material-ui/Dialog';
+import FlatButton from 'material-ui/FlatButton';
+
+
 // import "../../resources/static/css/style.css";
 // import "../../resources/static/css/scrolling-nav.css";
 // import "../../resources/static/js/scrolling-nav/scrolling-nav";
@@ -13,15 +17,52 @@ import Button from "react-bootstrap/es/Button";
 
 class Home extends React.Component{
 
-    componentDidMount(){
-        document.title = "Gabinet Kosmetyczny URODA";
+    constructor() {
+        super();
+        this.handleCloseDial = this.handleCloseDialog.bind(this);
+        this.login = this.handleLogin.bind(this);
+        this.state = {
+            openDialog: true,
+        }
     }
 
+    componentDidMount(){
+        document.title = "Gabinet Kosmetyczny URODA";
+        this.setState({
+            openDialog: true,
+        })
+    }
+
+    handleCloseDialog() {
+        this.setState({
+            openDialog: false,
+        })
+    }
+
+    handleLogin() {
+
+    }
     render(){
+
+        const actions = [
+            <FlatButton
+                label="Przeglądaj stronę"
+                primary={true}
+                onClick={this.handleCloseDial}
+            />,
+            <FlatButton
+                label="Zaloguj"
+                primary={true}
+                keyboardFocused={true}
+                href={"/login"}
+                // onClick={this.login}
+            />,
+        ];
+
         return(
             <div>
-            <link href={"/css/style.css"} rel={"stylesheet"}/>
-            <link href={"/css/scrolling-nav.css"} rel={"stylesheet"}/>
+                <link href={"/css/style.css"} rel={"stylesheet"}/>
+                <link href={"/css/scrolling-nav.css"} rel={"stylesheet"}/>
 
                 <div className="wrapper">
                     <div className="container-fluid CUSTOM-container-fluid">
@@ -262,6 +303,15 @@ class Home extends React.Component{
 
                 </div>
 
+                <Dialog
+                    title="Strona w budowie"
+                    actions={actions}
+                    modal={true}
+                    open={this.state.openDialog}
+                    onRequestClose={this.handleCloseDial}
+                >
+                    Strona obecnie jest w stanie budowy, możesz przejść bezpośrednio do logowania klikając w przycisk poniżej.
+                </Dialog>
             </div>
         );
     };

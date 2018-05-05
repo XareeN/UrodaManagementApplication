@@ -33,6 +33,7 @@ public class ShowLoggedUserInfo {
             userToShow.setTelNo(employee.getTelNo());
             userToShow.setAuthorities(employee.getAuthorities());
             userToShow.setIsActive(employee.getIsActive());
+            userToShow.setPassword(employee.getPassword());
 
 
             return new ResponseEntity<>(userToShow, HttpStatus.OK);

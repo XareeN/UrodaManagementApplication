@@ -29,6 +29,7 @@ class MyAcc extends React.Component {
         // this.parseDate2 = this.parseDate.bind(this);
         this.state = {
             user: {
+                id: "",
                 firstName: "",
                 lastName: "",
                 telNo: "",
@@ -160,21 +161,21 @@ class MyAcc extends React.Component {
     // }
 
 
-    handleDateChange(event, date) {
-        let m = date.getMonth() + 1;
-        let d = date.getDate();
-        if (m < 10) {
-            m = "0" + m;
-        }
-        if (d < 10) {
-            d = "0" + d;
-        }
-        let customDate = date.getFullYear() + "-" + m + "-" + d;
-        console.log(customDate);
-        this.setState({
-            data: customDate,
-        })
-    }
+    // handleDateChange(event, date) {
+    //     let m = date.getMonth() + 1;
+    //     let d = date.getDate();
+    //     if (m < 10) {
+    //         m = "0" + m;
+    //     }
+    //     if (d < 10) {
+    //         d = "0" + d;
+    //     }
+    //     let customDate = date.getFullYear() + "-" + m + "-" + d;
+    //     console.log(customDate);
+    //     this.setState({
+    //         data: customDate,
+    //     })
+    // }
 
     // updateCheck() {
     //     this.setState({disadablabled: !this.state.disadablabled})
@@ -231,34 +232,42 @@ class MyAcc extends React.Component {
                 eMail = this.state.user.eMail;
             }
             console.log("sprawdźmy czy dalej");
+            console.log("id: " + this.state.user.id);
             console.log("imie: " + imie);
             console.log("nazwisko: " + nazwisko);
             console.log("nrTel: " +nrTel);
             console.log("data: " + data);
             console.log("mail: " + eMail);
+            console.log("auth: " + this.state.user.authorities);
+            console.log("isActive: " + this.state.user.isActive);
+            console.log("pw: " + this.state.user.password);
 
         }
 
 
 
-        // fetch(url + "/auth/updateEmployee", {
-        //     method: "POST",
-        //     body: JSON.stringify({
-        //         firstName: this.state.imie,
-        //         lastName: this.state.nazwisko,
-        //         telNo: this.state.nrTel,
-        //         dateOfBirth: this.state.data,
-        //         eMail: this.state.mail,
-        //
-        //     })
-        //     ,
-        //     headers: header,
-        //     credentials: "same-origin"
-        // }).then((Response) => Response.json()).then((findresponse) => {
-        //
-        //     this.setState({update: findresponse})
-        //
-        // }).then(() => {
+        fetch(url + "/auth/updateEmployee", {
+            method: "POST",
+            body: JSON.stringify({
+                id: this.state.user.id,
+                firstName: imie,
+                lastName: nazwisko,
+                telNo: nrTel,
+                dateOfBirth: data,
+                eMail: eMail,
+                authorities: this.state.user.authorities,
+                isActive: this.state.user.isActive,
+                password: this.state.user.password,
+            })
+            ,
+            headers: header,
+            credentials: "same-origin"
+        }).then((Response) => Response.json()).then((findresponse) => {
+
+            this.setState({update: findresponse})
+
+        })
+        // .then(() => {
         //     let update = this.state.update;
         //     let users = this.state.users;
         //     users = users.concat(update);
@@ -462,7 +471,7 @@ class MyAcc extends React.Component {
                             fullWidth={true}
                             id={"dataM"}
                             name={"dataM"}
-                            onChange={(event) => this.handleDateChange(event)}
+                            onChange={(event) => this.handleUserInput(event)}
                         /><br/>
                         <TextField
                             defaultValue={this.state.user.eMail}

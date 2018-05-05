@@ -140,7 +140,8 @@ class Service extends React.Component {
             console.log(cena);
             console.log(czas);
 
-             } else {
+        // } else {
+
             fetch(url + "/auth/updateService", {
                 method: "POST",
                 body: JSON.stringify({
