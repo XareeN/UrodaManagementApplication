@@ -2,6 +2,14 @@ import React from "react";
 import $ from "jquery";
 import "fullcalendar/dist/locale/pl";
 import {url} from "../Urls";
+import {MuiThemeProvider} from "material-ui";
+import Dialog from 'material-ui/Dialog';
+import FlatButton from 'material-ui/FlatButton';
+import Snackbar from 'material-ui/Snackbar';
+
+
+
+
 
 
 let header = {
@@ -13,6 +21,10 @@ class Calendar extends React.Component {
 
     constructor(){
         super();
+        this.handleCloseDial = this.handleCloseDialog.bind(this);
+        this.handleDeleteDial = this.handleDeleteDialog.bind(this);
+        this.handleConfDeleteDial = this.handleConfDeleteDialog.bind(this);
+        this.handleClSnackbar = this.handleCloseSnackbar.bind(this);
         this.state = {
             calendarState: [],
             idToDelete: '',
@@ -23,13 +35,120 @@ class Calendar extends React.Component {
             godzOd: '',
             godzDo: '',
 
+            choosedId: '',
+            choosedTitle: '',
+            openDialog: false,
+            dialogHeader: '',
+            deleteClicked: false,
+            openSnackbar: false,
+
+
         }
 
 
     }
 
+    handleCloseDialog() {
+        this.setState({
+            openDialog: false,
+            dialogHeader: '',
+            deleteClicked: false,
+        })
+    }
+
+    handleDeleteDialog(){
+        this.setState({
+            dialogHeader: 'Na pewno usunąć wizytę?',
+            deleteClicked: true,
+        })
+    }
+
+    handleConfDeleteDialog(){
+            fetch(url + '/auth/deleteEvent', {
+                method: "POST",
+                body: JSON.stringify({
+                    id: this.state.choosedId,
+                })
+                ,
+                headers: header,
+                credentials: "same-origin"
+            }).then((Response) => Response.json()).then((findresponse) => {
+                // this.setState({
+                //     calendarState: findresponse
+                // })
+            });
+            console.log("usuwamy event o id: "+ this.state.choosedId);
+            this.setState({
+                openDialog: false,
+                deleteClicked: false,
+                openSnackbar: true,
+            });
+
+    }
+
+    handleCloseSnackbar(){
+        this.setState({
+            openSnackbar: false,
+        });
+    }
+
+
     render() {
-        return <div id="calendar" style={{marginTop: 12}}></div>;
+
+        const akcjeDialoguShow = [
+            <FlatButton
+                label="Cofnij"
+                primary={true}
+                onClick={this.handleCloseDial}
+            />,
+            <FlatButton
+                label="Usuń"
+                primary={true}
+                keyboardFocused={true}
+                onClick={this.handleDeleteDial}
+
+            />,
+        ];
+
+        const akcjeDialoguConfDelete = [
+            <FlatButton
+                label="Nie, Anuluj"
+                primary={true}
+                onClick={this.handleCloseDial}
+            />,
+            <FlatButton
+                label="Tak, Usuń"
+                primary={true}
+                keyboardFocused={true}
+                onClick={this.handleConfDeleteDial}
+
+            />,
+        ];
+
+
+        return (
+            <MuiThemeProvider>
+                <div id="calendar" style={{marginTop: 12}}/>
+
+                <Dialog
+                    title={this.state.dialogHeader}
+                    actions={this.state.deleteClicked ? akcjeDialoguConfDelete : akcjeDialoguShow}
+                    modal={false}
+                    open={this.state.openDialog}
+                    onRequestClose={this.handleCloseDial}
+                >
+                    {this.state.choosedTitle}
+                </Dialog>
+
+                <Snackbar
+                    open={this.state.openSnackbar}
+                    message="Usunięto wizytę!"
+                    autoHideDuration={4000}
+                    onRequestClose={this.handleClSnackbar}
+                />
+
+            </MuiThemeProvider>
+        );
     }
 
     componentDidMount() {
@@ -77,6 +196,7 @@ class Calendar extends React.Component {
                     }
                  ],
                 showNonCurrentDates: false,
+                contentHeight: 'auto',
                 eventClick: function(view){
                     // let id = view.id;
                     // this.setState({
@@ -86,45 +206,45 @@ class Calendar extends React.Component {
                     console.log("id: " + view.id);
 
 
-                    if(confirm('Czy na pewno chcesz usunąć wizytę: \n' + view.title)){
-                        fetch(url + '/auth/deleteEvent', {
-                            method: "POST",
-                            body: JSON.stringify({
-                                id: view.id,
-                            })
-                            ,
-                            headers: header,
-                            credentials: "same-origin"
-                        }).then((Response) => Response.json()).then((findresponse) => {
-                            // this.setState({
-                            //     calendarState: findresponse
-                            // })
-                        });
-                        console.log("usuwamy event o id: "+ view.id);
-                    }else{
-                        console.log("anulowane");
-                    };
+                    this.setState({
+                        choosedId: view.id,
+                        choosedTitle: view.title,
+                        dialogHeader: 'Wybrana wizyta: ',
+                        openDialog: true,
+
+                    })
 
 
+                    // if(confirm('Czy na pewno chcesz usunąć wizytę: \n' + view.title)){
+                    //     fetch(url + '/auth/deleteEvent', {
+                    //         method: "POST",
+                    //         body: JSON.stringify({
+                    //             id: view.id,
+                    //         })
+                    //         ,
+                    //         headers: header,
+                    //         credentials: "same-origin"
+                    //     }).then((Response) => Response.json()).then((findresponse) => {
+                    //         // this.setState({
+                    //         //     calendarState: findresponse
+                    //         // })
+                    //     });
+                    //     console.log("usuwamy event o id: "+ view.id);
+                    // }else{
+                    //     console.log("anulowane");
+                    // }
+
+
+
+                }.bind(this),
+                dayClick: function(date, jsEvent, view) {
+                    if (view.name !== 'month')
+                        return;
+
+                        $('#calendar').fullCalendar('changeView', 'agendaDay');
+                        $('#calendar').fullCalendar('gotoDate', date);
 
                 },
-
-
-
-
-                renderEvent:{
-
-                }
-                // dayClick: function(date, jsEvent, view) {
-                //
-                //     alert('Clicked on: ' + date.format());
-                //
-                //     alert('Coordinates: ' + jsEvent.pageX + ',' + jsEvent.pageY);
-                //
-                //     alert('Current view: ' + view.name);
-                // },
-
-
 
             })
         });

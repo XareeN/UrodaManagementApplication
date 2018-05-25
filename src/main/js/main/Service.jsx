@@ -11,6 +11,10 @@ import {Col, Row, Table} from "react-bootstrap";
 import Snackbar from 'material-ui/Snackbar';
 import CircularProgress from 'material-ui/CircularProgress';
 import Dialog from 'material-ui/Dialog';
+import BootstrapTable from 'react-bootstrap-table-next';
+import cellEditFactory from 'react-bootstrap-table2-editor';
+//import ReactTable from 'react-table';
+//import FloatingActionButton from 'material-ui/FloatingActionButton';
 import View from 'react';
 
 
@@ -31,6 +35,7 @@ class Service extends React.Component {
         this.handleCloseDial = this.handleCloseDialog.bind(this);
         this.modifyBtn = this.modifyButton.bind(this);
         this.confModBtn = this.confirmModifyButton.bind(this);
+        //this.openDial3 = this.openDialog3Button.bind(this);
         this.state = {
             services: [],
             serviceToModify: {},
@@ -46,6 +51,7 @@ class Service extends React.Component {
             open: false,
             openDialog: false,
             openDialog2: false,
+            openDialog3: false,
             isLoading: true,
             checkedItems: [],
             deleteBtnDisabled: true,
@@ -200,6 +206,13 @@ class Service extends React.Component {
         console.log(key);
     }
 
+    openDialog3Button() {
+        this.setState({
+            openDialog3: true,
+            open: false,
+        })
+    }
+
     confirmDeleteBtn() {
         fetch(url + "/auth/deleteService", {
             method: "POST",
@@ -268,12 +281,64 @@ class Service extends React.Component {
         this.setState({
             openDialog: false,
             openDialog2: false,
+            openDialog3: false,
             open: false,
         })
     }
 
+    handleDataChange(oldValue, newValue, row, column){
+
+
+        fetch(url + "/auth/updateService", {
+            method: "POST",
+            body: JSON.stringify({
+                id: row.id,
+                name: row.name,
+                price: row.price,
+                time: row.time
+            })
+            ,
+            headers: header,
+            credentials: "same-origin"
+        }).then((Response) => Response.json()).then((findresponse) => {
+
+            //this.setState({services: findresponse})
+
+
+        }).then(() => {
+            this.setState({
+                open: true,
+                openDialog2: false,
+                isLoading: false,
+            })
+        });
+
+    }
+
 
     render() {
+
+        const kolumny = [{
+            dataField: 'id',
+            text: 'id',
+            hidden: true
+        }, {
+            dataField: 'name',
+            text: 'Nazwa'
+        }, {
+            dataField: 'price',
+            text: 'Cena(zł)'
+        }, {
+            dataField: 'time',
+            text: 'Czas(min)'
+        }];
+
+        const wybierzRzedy = {
+            mode: 'checkbox',
+            clickToSelect: true,
+            clickToEdit: true
+        };
+
 
         let styles = {
             headline: {
@@ -314,31 +379,49 @@ class Service extends React.Component {
                     <Col md={12} sm={12}>
                         <Row style={{overflow: "scroll"}}>
                             <Col md={12} sm={12}>
-                                <Table>
-                                    <thead>
-                                    <tr>
-                                        <th>#</th>
-                                        <th>Nazwa</th>
-                                        <th>Cena (zł)</th>
-                                        <th>Czas (min)</th>
-                                        <th>Modyfikuj</th>
-                                    </tr>
-                                    </thead>
-                                    <tbody>
-                                    {this.state.services.map((dynamicData, key) =>
-                                        <tr key={key}>
-                                            <td><Checkbox
-                                                onCheck={(event, bool) => this.updateCheck(event, bool, dynamicData.id)}
-                                                style={styles.checkbox}
-                                            /></td>
-                                            <td>{dynamicData.name}</td>
-                                            <td>{dynamicData.price}</td>
-                                            <td>{dynamicData.time}</td>
-                                            <td><RaisedButton label={"click"} onClick={() => this.modifyBtn(key)}/></td>
-                                        </tr>
-                                    )}
-                                    </tbody>
-                                </Table>
+                                <BootstrapTable
+                                    keyField={'id'}
+                                    data={this.state.services}
+                                    columns={kolumny}
+                                    selectRow={wybierzRzedy}
+                                    bordered={false}
+                                    cellEdit={ cellEditFactory({
+                                        mode: 'dbclick',
+                                        afterSaveCell: (oldValue, newValue, row, column) => {this.handleDataChange(oldValue, newValue, row, column)}
+                                    }) }
+                                    striped
+                                    hover
+                                    noDataIndication={'Tabela jest pusta'}>
+                                    onCheck={console.log()}
+
+                                </BootstrapTable>
+
+                                {/*<Table>*/}
+                                    {/*<thead>*/}
+                                    {/*<tr>*/}
+                                        {/*<th>#</th>*/}
+                                        {/*<th>Nazwa</th>*/}
+                                        {/*<th>Cena (zł)</th>*/}
+                                        {/*<th>Czas (min)</th>*/}
+                                        {/*<th>Modyfikuj</th>*/}
+                                    {/*</tr>*/}
+                                    {/*</thead>*/}
+                                    {/*<tbody>*/}
+                                        {/*{this.state.services.map((dynamicData, key) =>*/}
+                                            {/*<tr key={key}>*/}
+                                                {/*<td><Checkbox*/}
+                                                    {/*onCheck={(event, bool) => this.updateCheck(event, bool, dynamicData.id)}*/}
+                                                    {/*style={styles.checkbox}*/}
+                                                {/*/></td>*/}
+                                                {/*<td>{dynamicData.name}</td>*/}
+                                                {/*<td>{dynamicData.price}</td>*/}
+                                                {/*<td>{dynamicData.time}</td>*/}
+                                                {/*<td><RaisedButton label={"click"} onClick={() => this.modifyBtn(key)}/></td>*/}
+                                            {/*</tr>*/}
+                                        {/*)}*/}
+                                    {/*</tbody>*/}
+                                {/*</Table>*/}
+
                             </Col>
                         </Row>
                         <Row style={{position: "sticky", bottom: 15}}>
@@ -386,6 +469,23 @@ class Service extends React.Component {
                 onClick={this.confModBtn}
             />,
         ];
+
+        const actions3 = [
+            <RaisedButton
+                label="Zapisz"
+                onClick={this.saveBtn}
+                style={styles.btnSave}
+                primary={true}/>,
+            <RaisedButton
+                label="Wyczyść pola"
+                style={styles.btnClear}
+                onClick={this.clearBtn}
+            />,
+        ];
+
+
+
+
 
         return (
             <Row>
@@ -440,6 +540,15 @@ class Service extends React.Component {
                                 </Row>
                             </Tab>
                         </Tabs>
+                        {/*<FloatingActionButton*/}
+                            {/*style={{*/}
+                                {/*position: "sticky",*/}
+                                {/*bottom: 15,*/}
+                                {/*right: 15,*/}
+                                {/*float: "right",*/}
+                            {/*}}*/}
+                            {/*onClick={this.openDial3}*/}
+                        {/*/>*/}
                     </Col>
 
                     <Snackbar
@@ -456,6 +565,7 @@ class Service extends React.Component {
                     >
                         Czy na pewno chcesz usunąć zaznaczone pozycje?
                     </Dialog>
+
                     <Dialog
                         title="Modyfikuj"
                         actions={actions2}
@@ -487,6 +597,42 @@ class Service extends React.Component {
                             floatingLabelText={"Czas na wykonanie (min)"}
                             defaultValue={this.state.serviceToModify.time}
                             onChange={(event) => this.handleUserInput(event)}/><br/>
+                    </Dialog>
+
+                    <Dialog
+                        title={"Dodaj usługę"}
+                        actions={actions3}
+                        modal={false}
+                        open={this.state.openDialog3}
+                        onRequestClose={this.handleCloseDial}
+                        >
+                        <h2 style={styles.headline}>Wypełnij wszystkie pola</h2>
+                        <Paper zDepth={2} style={styles.customPaper}>
+                            <TextField hintText="Nazwa" name={"nazwa"} id={"nazwa"}
+                                       onChange={(event) => this.handleUserInput(event)}
+                                       underlineShow={false}
+                                       fullWidth={true}/>
+                            <Divider/>
+                            <TextField hintText="Cena" name={"cena"} id={"cena"}
+                                       onChange={(event) => this.handleUserInput(event)}
+                                       underlineShow={false}
+                                       fullWidth={true}/>
+                            <Divider/>
+                            <TextField hintText="Czas na wykonanie" name={"czas"} id={"czas"}
+                                       onChange={(event) => this.handleUserInput(event)}
+                                       underlineShow={false}
+                                       fullWidth={true}/>
+                            <Divider/>
+                        </Paper>
+                        <RaisedButton
+                            label="Zapisz"
+                            onClick={this.saveBtn}
+                            style={styles.btnSave}
+                            primary={true}/>
+                        <RaisedButton
+                            label="Wyczyść pola"
+                            style={styles.btnClear}
+                            onClick={this.clearBtn}/>
                     </Dialog>
                 </MuiThemeProvider>
             </Row>
