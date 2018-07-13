@@ -25,12 +25,18 @@ public class UserDetailsService implements org.springframework.security.core.use
         MongoDatabase database = mongoClient.getDatabase("CloudFoundry_u4tj3ort_nsf2tr0v");
         MongoCollection<Document> collection = database.getCollection("employee");
         Document document = collection.find(Filters.eq("eMail", eMail)).first();
-        if(document!=null) {
-            String password = document.getString("password");
-            List<String> authorities = (List<String>) document.get("authorities");
-            MongoUserDetails mongoUserDetails = new MongoUserDetails(eMail,password,authorities.toArray(new String[authorities.size()]));
-            return mongoUserDetails;
+        if(eMail != null && eMail != "") {
+            if(document!=null) {
+                String password = document.getString("password");
+                List<String> authorities = (List<String>) document.get("authorities");
+                MongoUserDetails mongoUserDetails = new MongoUserDetails(eMail,password,authorities.toArray(new String[authorities.size()]));
+                return mongoUserDetails;
+            }
+        }else{
+            //jeżeli email jest pusty
+            return null;
         }
+
         return null;
     }
 

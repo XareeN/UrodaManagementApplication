@@ -15,6 +15,9 @@ import MenuItem from 'material-ui/MenuItem';
 import Snackbar from 'material-ui/Snackbar';
 import CircularProgress from 'material-ui/CircularProgress';
 import Dialog from 'material-ui/Dialog';
+import BootstrapTable from 'react-bootstrap-table-next';
+import cellEditFactory from 'react-bootstrap-table2-editor';
+import filterFactory, {textFilter} from 'react-bootstrap-table2-filter';
 
 
 let header = {
@@ -143,18 +146,18 @@ class User extends React.Component {
         })
     }
 
-    handleUserPasswordInput(event, value){
+    handleUserPasswordInput(event, value) {
         const evVal = event.target.value;
         const vaLen = value.length;
 
         console.log(vaLen + " : " + evVal);
-        if(vaLen <= 7){
+        if (vaLen <= 7) {
             this.setState({
                 newUserSaveDisabled: true,
                 haslo: evVal,
             })
         }
-        else{
+        else {
             this.setState({
                 newUserSaveDisabled: false,
                 haslo: evVal,
@@ -222,6 +225,50 @@ class User extends React.Component {
         })
     }
 
+    handleDataChange(oldValue, newValue, row, column) {
+
+        if (this.state.user.id === row.id) {
+            console.log("id = id");
+            if(oldValue === this.state.user.eMail){
+                alert("Właśnie zmieniłeś/-aś swój adres email \nWymagane jest ponowne zalogownie na konto");
+            }
+
+        } else {
+
+            fetch(url + "/auth/updateEmployee", {
+                method: "POST",
+                body: JSON.stringify({
+                    id: row.id,
+                    firstName: row.firstName,
+                    lastName: row.lastName,
+                    telNo: row.telNo,
+                    dateOfBirth: row.dateOfBirth,
+                    eMail: row.eMail,
+                    authorities: row.authorities,
+                    isActive: row.isActive,
+                    password: row.password
+                })
+                ,
+                headers: header,
+                credentials: "same-origin"
+            }).then((Response) => Response.json()).then((findresponse) => {
+
+                //this.setState({users: findresponse})
+
+
+            }).then(() => {
+                // this.setState({
+                //     openSnackbar: true,
+                //     openDialog2: false,
+                //     isLoading: false,
+                // })
+                console.log(row);
+            });
+
+        }
+
+    }
+
     deleteBtn() {
         this.setState({
             openDialog: true,
@@ -267,7 +314,7 @@ class User extends React.Component {
         console.log(key);
     }
 
-    confirmModifyButton(){
+    confirmModifyButton() {
         let imie = this.state.imieM;
         let nazwisko = this.state.nazwiskoM;
         let nrTel = this.state.nrTelM;
@@ -355,7 +402,6 @@ class User extends React.Component {
             });
 
 
-
         }
 
     }
@@ -370,6 +416,98 @@ class User extends React.Component {
 
 
     render() {
+
+        const kolumny = [{
+            dataField: 'id',
+            text: 'id',
+            hidden: true
+        }, {
+            dataField: 'firstName',
+            text: 'Imię',
+            filter: textFilter(),
+        }, {
+            dataField: 'lastName',
+            text: 'Nazwisko',
+            filter: textFilter(),
+        }, {
+            dataField: 'telNo',
+            text: 'Nr kontaktowy',
+            filter: textFilter(),
+            validator: (newValue, row, column) => {
+                if (isNaN(newValue)) {
+                    return {
+                        valid: false,
+                        message: 'Numer telefonu powinien być liczbą'
+                    };
+                }
+                if (newValue.length > 10) {
+                    return {
+                        valid: false,
+                        message: 'Numer telefonu jest zbyt długi'
+                    };
+                }
+                return true;
+            }
+        }, {
+            dataField: 'dateOfBirth',
+            text: 'Data urodzenia (YYYY-MM-DD)',
+            filter: textFilter(),
+            validator: (newValue, row, column) => {
+                if (newValue !== "^\d{4}-\d{2}-\d{2}$") {
+                    return {
+                        valid: false,
+                        message: 'Data powinna mieć format YYYY-MM-DD'
+                    };
+                }
+                return true;
+            }
+        }, {
+            dataField: 'eMail',
+            text: 'E-mail',
+            filter: textFilter(),
+            // validator: (newValue, row, column) => {
+            //     if(row.email === this.state.user.email){
+            //         return{
+            //             valid: false,
+            //             message: ''
+            //         }
+            //     }
+            //     return true;
+            // }
+        }, {
+            dataField: 'authorities',
+            text: 'Grupy',
+            filter: textFilter(),
+        }, {
+            dataField: 'isActive',
+            text: 'Czy aktywny',
+            filter: textFilter(),
+        },
+            //     {
+            //     dataField: 'password',
+            //     text: 'Hasło',
+            //     filter: textFilter(),
+            //     hidden: true
+            // },
+        ];
+
+        const wybierzRzedy = {
+            mode: 'checkbox',
+            clickToSelect: true,
+            clickToEdit: true,
+            onSelect: (row, isSelect, rowIndex, e) => {
+                console.log("row.id: " + row.id);
+                console.log("isSelect: " + isSelect);
+                console.log("rowIndex: " + rowIndex);
+                console.log("e: " + e);
+            },
+            onSelectAll: (isSelect, rows, e) => {
+                console.log("isSelect: " + isSelect);
+                console.log("rows: " + rows);
+                console.log("e: " + e);
+            },
+        };
+
         let styles = {
             headline: {
                 fontSize: 24,
@@ -406,53 +544,76 @@ class User extends React.Component {
 
 
         let content =
-            <Row>
-                <Col md={12} sm={12}>
-                    <Row>
-                        <Col md={12} sm={12}>
-                            <Table>
-                                <thead>
-                                <tr>
-                                    <th>#</th>
-                                    <th>Imię</th>
-                                    <th>Nazwisko</th>
-                                    <th>Nr kontaktowy</th>
-                                    <th>Data urodzenia</th>
-                                    <th>E-mail</th>
-                                    <th>Modyfikuj</th>
-                                    {/*<th>Rola</th>*/}
-                                </tr>
-                                </thead>
-                                <tbody>
-                                {this.state.users.map((dynamicData, key) =>
-                                    <tr key={key}>
-                                        <td><Checkbox
-                                            onCheck={(event, bool) => this.updateCheck(event, bool, dynamicData.id)}
-                                            style={styles.checkbox}
-                                            disabled={this.state.checkBoxDisabled}
-                                        /></td>
-                                        <td>{dynamicData.firstName}</td>
-                                        <td>{dynamicData.lastName}</td>
-                                        <td>{dynamicData.telNo}</td>
-                                        <td>{dynamicData.dateOfBirth}</td>
-                                        <td>{dynamicData.eMail}</td>
-                                        <td><RaisedButton label={"click"} onClick={() => this.modifyBtn(key)}/></td>
-                                        {/*<td>{console.log(dynamicData.authorities.pop())}</td>*/}
-                                    </tr>
-                                )}
-                                </tbody>
-                            </Table>
-                        </Col>
-                    </Row>
-                    <Row style={{position: "sticky", bottom: 15}}>
-                        <Col md={12} sm={12}>
-                            <RaisedButton label={"Usuń zaznaczone"} onClick={this.delBtn}
-                                          disabled={this.state.deleteBtnDisabled}
-                                          style={styles.deleteBtn}/>
-                        </Col>
-                    </Row>
-                </Col>
-            </Row>
+                <Row>
+                    <Col md={12} sm={12}>
+                        <Row>
+                            <Col md={12} sm={12}>
+                                <BootstrapTable
+                                    keyField={'id'}
+                                    data={this.state.users}
+                                    columns={kolumny}
+                                    selectRow={wybierzRzedy}
+                                    bordered={false}
+                                    cellEdit={cellEditFactory({
+                                        mode: 'dbclick',
+                                        afterSaveCell: (oldValue, newValue, row, column) => {
+                                            this.handleDataChange(oldValue, newValue, row, column)
+                                        },
+                                    })}
+                                    filter={filterFactory()}
+                                    striped
+                                    hover
+                                    noDataIndication={'Tabela jest pusta'}
+                                    onCheck={console.log()}
+                                >
+
+
+                                </BootstrapTable>
+
+
+                                {/*<Table>*/}
+                                {/*<thead>*/}
+                                {/*<tr>*/}
+                                {/*<th>#</th>*/}
+                                {/*<th>Imię</th>*/}
+                                {/*<th>Nazwisko</th>*/}
+                                {/*<th>Nr kontaktowy</th>*/}
+                                {/*<th>Data urodzenia</th>*/}
+                                {/*<th>E-mail</th>*/}
+                                {/*<th>Modyfikuj</th>*/}
+                                {/*/!*<th>Rola</th>*!/*/}
+                                {/*</tr>*/}
+                                {/*</thead>*/}
+                                {/*<tbody>*/}
+                                {/*{this.state.users.map((dynamicData, key) =>*/}
+                                {/*<tr key={key}>*/}
+                                {/*<td><Checkbox*/}
+                                {/*onCheck={(event, bool) => this.updateCheck(event, bool, dynamicData.id)}*/}
+                                {/*style={styles.checkbox}*/}
+                                {/*disabled={this.state.checkBoxDisabled}*/}
+                                {/*/></td>*/}
+                                {/*<td>{dynamicData.firstName}</td>*/}
+                                {/*<td>{dynamicData.lastName}</td>*/}
+                                {/*<td>{dynamicData.telNo}</td>*/}
+                                {/*<td>{dynamicData.dateOfBirth}</td>*/}
+                                {/*<td>{dynamicData.eMail}</td>*/}
+                                {/*<td><RaisedButton label={"click"} onClick={() => this.modifyBtn(key)}/></td>*/}
+                                {/*/!*<td>{console.log(dynamicData.authorities.pop())}</td>*!/*/}
+                                {/*</tr>*/}
+                                {/*)}*/}
+                                {/*</tbody>*/}
+                                {/*</Table>*/}
+                            </Col>
+                        </Row>
+                        <Row style={{position: "sticky", bottom: 15}}>
+                            <Col md={12} sm={12}>
+                                <RaisedButton label={"Usuń zaznaczone"} onClick={this.delBtn}
+                                              disabled={this.state.deleteBtnDisabled}
+                                              style={styles.deleteBtn}/>
+                            </Col>
+                        </Row>
+                    </Col>
+                </Row>
 
 
             // <div align="center">

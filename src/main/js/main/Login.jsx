@@ -40,11 +40,11 @@ class Login extends React.Component {
                 <Col md={4} sm={2}/>
                 <Col md={4} sm={8}>
                     <form role="form" method="post">
-                        <label htmlFor={"inputUser"}>
+                        <label htmlFor={"inputUser"} style={{marginRight: 5}}>
                             <span>Email</span>
                             <input name="userName" type="text" className="form-control" id="inputUser"/>
                         </label>
-                        <label htmlFor={"inputPassword"}>
+                        <label htmlFor={"inputPassword"} style={{marginRight: 5}}>
                             <span>Hasło</span>
                             <input name="userPassword" type="password" className="form-control" id="inputPassword"/>
                         </label>

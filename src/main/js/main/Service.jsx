@@ -13,6 +13,7 @@ import CircularProgress from 'material-ui/CircularProgress';
 import Dialog from 'material-ui/Dialog';
 import BootstrapTable from 'react-bootstrap-table-next';
 import cellEditFactory from 'react-bootstrap-table2-editor';
+import filterFactory, { textFilter } from 'react-bootstrap-table2-filter';
 //import ReactTable from 'react-table';
 //import FloatingActionButton from 'material-ui/FloatingActionButton';
 import View from 'react';
@@ -35,7 +36,9 @@ class Service extends React.Component {
         this.handleCloseDial = this.handleCloseDialog.bind(this);
         this.modifyBtn = this.modifyButton.bind(this);
         this.confModBtn = this.confirmModifyButton.bind(this);
+        this.handleClSnackbar = this.handleCloseSnackbar.bind(this);
         //this.openDial3 = this.openDialog3Button.bind(this);
+        this.handleIdToDel = this.handleIdToDelete.bind(this);
         this.state = {
             services: [],
             serviceToModify: {},
@@ -48,10 +51,10 @@ class Service extends React.Component {
             nazwaM: '',
             cenaM: '',
             czasM: '',
-            open: false,
-            openDialog: false,
-            openDialog2: false,
-            openDialog3: false,
+            openSnackbar: false,
+            deleteConfirmDialog: false,
+            modifyDialog: false,
+            addServiceDialog: false,
             isLoading: true,
             checkedItems: [],
             deleteBtnDisabled: true,
@@ -112,7 +115,7 @@ class Service extends React.Component {
                 console.log(services)
             });
             this.setState({
-                open: true,
+                openSnackbar: true,
             })
         }
 
@@ -176,8 +179,8 @@ class Service extends React.Component {
 
             }).then(() => {
                 this.setState({
-                    open: true,
-                    openDialog2: false,
+                    openSnackbar: true,
+                    modifyDialog: false,
                     isLoading: false,
                 })
             });
@@ -187,8 +190,8 @@ class Service extends React.Component {
 
     deleteButton() {
         this.setState({
-            openDialog: true,
-            open: false,
+            deleteConfirmDialog: true,
+            openSnackbar: false,
         })
     }
 
@@ -196,8 +199,8 @@ class Service extends React.Component {
         let serviceToModify = this.state.services[key];
         this.setState({
             serviceToModify,
-            openDialog2: true,
-            open: false,
+            modifyDialog: true,
+            openSnackbar: false,
 
 
         });
@@ -208,8 +211,8 @@ class Service extends React.Component {
 
     openDialog3Button() {
         this.setState({
-            openDialog3: true,
-            open: false,
+            addServiceDialog: true,
+            //openSnackbar: false,
         })
     }
 
@@ -279,16 +282,14 @@ class Service extends React.Component {
 
     handleCloseDialog() {
         this.setState({
-            openDialog: false,
-            openDialog2: false,
-            openDialog3: false,
-            open: false,
+            deleteConfirmDialog: false,
+            modifyDialog: false,
+            addServiceDialog: false,
+            //openSnackbar: false,
         })
     }
 
     handleDataChange(oldValue, newValue, row, column){
-
-
         fetch(url + "/auth/updateService", {
             method: "POST",
             body: JSON.stringify({
@@ -307,13 +308,47 @@ class Service extends React.Component {
 
         }).then(() => {
             this.setState({
-                open: true,
-                openDialog2: false,
+                openSnackbar: true,
+                modifyDialog: false,
                 isLoading: false,
             })
         });
 
     }
+
+    handleCloseSnackbar(){
+        this.setState({
+            openSnackbar: false,
+        });
+    }
+
+    handleIdToDelete(row, isSelect, rowIndex, e){
+        if(isSelect){
+            this.state.idToDelete.push(row.id);
+        }
+
+        if(!isSelect){
+            this.state.idToDelete.splice(this.state.idToDelete.indexOf(row.id), 1);
+        }
+
+        // if(!!(this.state.idToDelete)){
+        //     this.setState({
+        //         deleteBtnDisabled: false
+        //     });
+        // }else{
+        //     this.setState({
+        //         deleteBtnDisabled: true
+        //     });
+        // }
+
+        //+----------------------------------------------------+
+        //| po odkomentowaniu tego kawalka zaznaczanie swiruje |
+        //+----------------------------------------------------+
+        console.log("idToDelete: " + this.state.idToDelete);
+
+    }
+
+
 
 
     render() {
@@ -324,19 +359,58 @@ class Service extends React.Component {
             hidden: true
         }, {
             dataField: 'name',
-            text: 'Nazwa'
+            text: 'Nazwa',
+            filter: textFilter()
         }, {
             dataField: 'price',
-            text: 'Cena(zł)'
+            text: 'Cena(zł)',
+            filter: textFilter(),
+            validator: (newValue, row, column) => {
+                if(isNaN(newValue)){
+                    return{
+                        valid: false,
+                        message: 'Cena powinna być liczbą'
+                    };
+                }
+                if(newValue > 10000){
+                    return{
+                        valid: false,
+                        message: 'Cena powinna być mniejsza, niż 10 000'
+                    };
+                }
+            }
         }, {
             dataField: 'time',
-            text: 'Czas(min)'
+            text: 'Czas(min)',
+            filter: textFilter(),
+            validator: (newValue, row, column) => {
+                if(isNaN(newValue)){
+                    return{
+                        valid: false,
+                        message: 'Czas powinien być liczbą minut'
+                    };
+                }
+            }
         }];
 
         const wybierzRzedy = {
             mode: 'checkbox',
             clickToSelect: true,
-            clickToEdit: true
+            clickToEdit: true,
+            onSelect: (row, isSelect, rowIndex, e) => this.handleIdToDelete(row, isSelect, rowIndex, e)
+            // {
+            //
+            //     console.log("row.id: " + row.id);
+            //     console.log("isSelect: " + isSelect);
+            //     console.log("rowIndex: " + rowIndex);
+            //     console.log("e: " + e);
+            // }
+            ,
+            onSelectAll: (isSelect, rows, e) => {
+                console.log("isSelect: " + isSelect);
+                console.log("rows: " + rows);
+                console.log("e: " + e);
+            },
         };
 
 
@@ -387,8 +461,9 @@ class Service extends React.Component {
                                     bordered={false}
                                     cellEdit={ cellEditFactory({
                                         mode: 'dbclick',
-                                        afterSaveCell: (oldValue, newValue, row, column) => {this.handleDataChange(oldValue, newValue, row, column)}
+                                        afterSaveCell: (oldValue, newValue, row, column) => {this.handleDataChange(oldValue, newValue, row, column)},
                                     }) }
+                                    filter={filterFactory()}
                                     striped
                                     hover
                                     noDataIndication={'Tabela jest pusta'}>
@@ -552,15 +627,16 @@ class Service extends React.Component {
                     </Col>
 
                     <Snackbar
-                        open={this.state.open}
+                        open={this.state.openSnackbar}
                         message="Usługa dodana pomyślnie"
                         autoHideDuration={4000}
+                        onRequestClose={this.handleClSnackbar}
                     />
                     <Dialog
                         title="Potwierdź decyzję"
                         actions={actions}
                         modal={false}
-                        open={this.state.openDialog}
+                        open={this.state.deleteConfirmDialog}
                         onRequestClose={this.handleCloseDial}
                     >
                         Czy na pewno chcesz usunąć zaznaczone pozycje?
@@ -570,7 +646,7 @@ class Service extends React.Component {
                         title="Modyfikuj"
                         actions={actions2}
                         modal={false}
-                        open={this.state.openDialog2}
+                        open={this.state.modifyDialog}
                         onRequestClose={this.handleCloseDial}
                         style={{overflow: "hidden"}}>
                         <TextField
@@ -603,7 +679,7 @@ class Service extends React.Component {
                         title={"Dodaj usługę"}
                         actions={actions3}
                         modal={false}
-                        open={this.state.openDialog3}
+                        open={this.state.addServiceDialog}
                         onRequestClose={this.handleCloseDial}
                         >
                         <h2 style={styles.headline}>Wypełnij wszystkie pola</h2>
